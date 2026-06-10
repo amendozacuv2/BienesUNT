@@ -12,7 +12,7 @@ use RuntimeException;
 
 class EstatesSeeder extends Seeder
 {
-    private const TOTAL_ESTATES = 5000000;
+    private const TOTAL_ESTATES = 100000;
 
     private const BATCH_SIZE = 3000;
 
