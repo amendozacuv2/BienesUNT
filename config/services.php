@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'perudevs' => [
+        'dni_key' => env('DN1_API'),
+    ],
 ];

@@ -1,0 +1,101 @@
+areas
+    id
+    uuid            UUID NOT NULL UNIQUE
+    name
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+
+users
+    id
+    uuid            UUID NOT NULL UNIQUE
+    name
+    username
+    password
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+    (ROLES SE MANEJAN CON SPATIE)
+
+locations
+    id
+    uuid
+    name
+    area_id
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+
+user_area
+    id
+    user_id
+    area_id
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+
+employees
+    id
+    uuid            UUID NOT NULL UNIQUE
+    dni
+    name
+    lastname
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+
+employee_area
+    id
+    employee_id     BIGINT NOT NULL
+    area_id         BIGINT NOT NULL
+    is_active (1=ACTIVO) (0=INACTIVO)
+    TIMESTAMP
+
+estates
+    id
+    uuid
+
+    location_id BIGINT NOT NULL
+
+    patrimonial_code VARCHAR(100) NULL
+    internal_code VARCHAR(100) NOT NULL UNIQUE
+
+    denomination VARCHAR(255) NULL
+    brand VARCHAR(150) NULL
+    model VARCHAR(150) NULL
+    type VARCHAR(150) NULL
+    color VARCHAR(100) NULL
+    series VARCHAR(150) NULL
+    dimensions TEXT NULL
+    others TEXT NULL
+    situation VARCHAR(80) NULL
+    conservation_status VARCHAR(80) NULL
+    observation TEXT NULL
+
+    created_at
+    updated_at
+
+audit_logs
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid
+    user_id             BIGINT NULL
+
+    auditable_type      VARCHAR(150) NOT NULL (EJEMPLO: estates)
+    auditable_id        BIGINT NOT NULL (EJEMPLO: auditable_id   = 3)
+
+    action              VARCHAR(80) NOT NULL    CREATED
+                                                UPDATED
+                                                DELETED
+                                                CHANGED_LOCATION
+
+    old_values          JSONB NULL
+    new_values          JSONB NULL
+
+    ip_address          VARCHAR(80) NULL
+    user_agent          TEXT NULL
+
+    created_at          TIMESTAMP NULL
+
+    RELACIONES:
+    user_id REFERENCES users(id)
+
+    ÍNDICES:
+    index(user_id)
+    index(auditable_type, auditable_id)
+    index(action)
+    index(created_at)

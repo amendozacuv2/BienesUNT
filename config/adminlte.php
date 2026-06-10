@@ -110,7 +110,7 @@ return [
     */
 
     'preloader' => [
-        'enabled' => true,
+        'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
             'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
@@ -156,7 +156,7 @@ return [
     'layout_boxed' => null,
     'layout_fixed_sidebar' => null,
     'layout_fixed_navbar' => null,
-    'layout_fixed_footer' => null,
+    'layout_fixed_footer' => true,
     'layout_dark_mode' => null,
 
     /*
@@ -299,16 +299,44 @@ return [
     */
 
     'menu' => [
+        // Navbar items:
         [
-            'text' => 'Inicio',
-            'url' => 'home',
-            'icon' => 'fas fa-fw fa-house-user',
-        ],
-        [
-            'text' => 'Perfil',
-            'url' => 'profile',
+            'text' => 'Mi Perfil',
+            'route' => 'profile',
             'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.profile',
         ],
+        [
+            'text' => 'Roles',
+            'route' => 'roles.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.role',
+        ],
+        [
+            'text' => 'Áreas',
+            'route' => 'areas.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.area',
+        ],
+        [
+            'text' => 'Ubicaciones',
+            'route' => 'locations.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.location',
+        ],
+        [
+            'text' => 'Empleados',
+            'route' => 'employees.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.employee',
+        ],
+        [
+            'text' => 'Usuarios',
+            'route' => 'users.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.user',
+        ],
+
     ],
 
     /*
@@ -392,12 +420,17 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css',
+                ],
+                [
                     'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
+                    'asset' => true,
+                    'location' => 'vendor/sweetalert2/sweetalert2.all.min.js',
                 ],
             ],
         ],

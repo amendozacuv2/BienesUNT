@@ -20,34 +20,34 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('home', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('profile', absolute: false), navigate: true);
     }
 }; ?>
 
 <x-slot name="authHeader">
-    Iniciar sesion
+    Iniciar sesión
 </x-slot>
 
 <div>
     <form wire:submit="login">
         <div class="input-group mb-3">
             <input
-                type="email"
-                wire:model="form.email"
-                name="email"
-                class="form-control @error('form.email') is-invalid @enderror"
-                placeholder="Correo electronico"
+                type="text"
+                wire:model="form.username"
+                name="username"
+                class="form-control @error('form.username') is-invalid @enderror"
+                placeholder="Usuario"
                 autocomplete="username"
                 autofocus
             >
 
             <div class="input-group-append">
                 <div class="input-group-text">
-                    <span class="fas fa-envelope {{ config('adminlte.classes_auth_icon', '') }}"></span>
+                    <span class="fas fa-user {{ config('adminlte.classes_auth_icon', '') }}"></span>
                 </div>
             </div>
 
-            @error('form.email')
+            @error('form.username')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>
@@ -60,7 +60,7 @@ new #[Layout('layouts.guest')] class extends Component
                 wire:model="form.password"
                 name="password"
                 class="form-control @error('form.password') is-invalid @enderror"
-                placeholder="Contrasena"
+                placeholder="Contraseña"
                 autocomplete="current-password"
             >
 
@@ -80,13 +80,24 @@ new #[Layout('layouts.guest')] class extends Component
         <div class="row">
             <div class="col-7">
                 <div class="icheck-primary">
-                    <input type="checkbox" wire:model="form.remember" name="remember" id="remember">
-                    <label for="remember">Recordarme</label>
+                    <input
+                        type="checkbox"
+                        wire:model="form.remember"
+                        name="remember"
+                        id="remember"
+                    >
+
+                    <label for="remember">
+                        Recordarme
+                    </label>
                 </div>
             </div>
 
             <div class="col-5">
-                <button type="submit" class="btn btn-block {{ config('adminlte.classes_auth_btn', 'btn-flat btn-primary') }}">
+                <button
+                    type="submit"
+                    class="btn btn-block {{ config('adminlte.classes_auth_btn', 'btn-flat btn-primary') }}"
+                >
                     <span class="fas fa-sign-in-alt"></span>
                     Ingresar
                 </button>

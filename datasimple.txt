@@ -1,0 +1,18 @@
+========================================================
+TABLA: areas
+DESCRIPCIÓN: Áreas administrativas de la entidad.
+Ejemplo: TECNOLOGÍAS, LOGÍSTICA, ALMACÉN CENTRAL.
+========================================================
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid            UUID NOT NULL UNIQUE
+    name            VARCHAR(150) NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    ÍNDICES:
+    unique(uuid)
+    index(name)
+    index(status)
+
+
