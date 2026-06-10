@@ -1,0 +1,290 @@
+========================================================
+TABLA: areas
+DESCRIPCIÓN: Áreas administrativas de la entidad.
+Ejemplo: TECNOLOGÍAS, LOGÍSTICA, ALMACÉN CENTRAL.
+========================================================
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid            UUID NOT NULL UNIQUE
+    name            VARCHAR(150) NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    ÍNDICES:
+    unique(uuid)
+    index(name)
+    index(status)
+
+========================================================
+TABLA: locations
+DESCRIPCIÓN: Ubicaciones físicas donde pueden estar los bienes.
+Ejemplo: PALACIO MUNICIPAL, COSTADO DE PALACIO MUNICIPAL,
+OFICINA DE INFORMÁTICA, ALMACÉN CENTRAL.
+========================================================
+
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid            UUID NOT NULL UNIQUE
+    parent_id       BIGINT NULL
+    name            VARCHAR(180) NOT NULL
+    type            VARCHAR(80) NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    RELACIONES:
+    parent_id REFERENCES locations(id)
+
+    ÍNDICES:
+    unique(uuid)
+    index(parent_id)
+    index(name)
+    index(type)
+    index(status)
+
+========================================================
+TABLA: users
+DESCRIPCIÓN: Usuarios que acceden al sistema.
+Spatie manejará roles y permisos.
+========================================================
+
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid            UUID NOT NULL UNIQUE
+    dni             VARCHAR(20) NOT NULL UNIQUE
+    name            VARCHAR(120) NOT NULL
+    lastname        VARCHAR(120) NOT NULL
+    username        VARCHAR(80) NOT NULL UNIQUE
+    password        VARCHAR(255) NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    ÍNDICES:
+    unique(uuid)
+    unique(dni)
+    unique(username)
+    index(status)
+
+========================================================
+TABLA: user_area
+DESCRIPCIÓN: Vincula usuarios del sistema con áreas.
+Sirve para limitar qué áreas puede gestionar/ver cada usuario.
+========================================================
+
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    user_id         BIGINT NOT NULL
+    area_id         BIGINT NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    RELACIONES:
+    user_id REFERENCES users(id)
+    area_id REFERENCES areas(id)
+
+    ÍNDICES:
+    index(user_id)
+    index(area_id)
+    index(status)
+    index(user_id, status)
+    index(area_id, status)
+    unique(user_id, area_id)
+
+========================================================
+TABLA: employees
+DESCRIPCIÓN: Trabajadores o responsables seleccionables para bienes.
+No necesariamente todos son usuarios del sistema.
+========================================================
+
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid            UUID NOT NULL UNIQUE
+    dni             VARCHAR(20) NOT NULL UNIQUE
+    name            VARCHAR(120) NOT NULL
+    lastname        VARCHAR(120) NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    ÍNDICES:
+    unique(uuid)
+    unique(dni)
+    index(name)
+    index(lastname)
+    index(status)
+
+========================================================
+TABLA: employee_area
+DESCRIPCIÓN: Vincula empleados con áreas.
+Indica a qué área pertenece un empleado/responsable.
+========================================================
+
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT
+    employee_id     BIGINT NOT NULL
+    area_id         BIGINT NOT NULL
+    status          BOOLEAN NOT NULL DEFAULT TRUE
+    created_at      TIMESTAMP NULL
+    updated_at      TIMESTAMP NULL
+
+    RELACIONES:
+    employee_id REFERENCES employees(id)
+    area_id REFERENCES areas(id)
+
+    ÍNDICES:
+    index(employee_id)
+    index(area_id)
+    index(status)
+    index(employee_id, status)
+    index(area_id, status)
+    unique(employee_id, area_id)
+
+========================================================
+TABLA: estates
+DESCRIPCIÓN: Bienes patrimoniales registrados en el sistema.
+========================================================
+
+    id                      BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid                    UUID NOT NULL UNIQUE
+
+    patrimonial_code         VARCHAR(100) NULL
+    internal_code            VARCHAR(100) NOT NULL UNIQUE
+
+    denomination             VARCHAR(255) NULL
+    brand                    VARCHAR(150) NULL
+    model                    VARCHAR(150) NULL
+    type                     VARCHAR(150) NULL
+    color                    VARCHAR(100) NULL
+    series                   VARCHAR(150) NULL
+    dimensions               TEXT NULL
+    others                   TEXT NULL
+
+    situation                VARCHAR(80) NULL
+    conservation_status      VARCHAR(80) NULL
+    observation              TEXT NULL
+
+    created_at               TIMESTAMP NULL
+    updated_at               TIMESTAMP NULL
+
+    ÍNDICES:
+    unique(uuid)
+    unique(internal_code)
+    index(patrimonial_code)
+    index(denomination)
+    index(brand)
+    index(model)
+    index(series)
+    index(type)
+    index(situation)
+    index(conservation_status)
+    index(brand, model)
+
+========================================================
+TABLA: estate_assignments
+DESCRIPCIÓN: Historial de asignaciones/movimientos de bienes.
+Aquí se define qué bien está asignado, a qué empleado/área,
+en qué ubicación física y desde cuándo.
+========================================================
+
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT
+    uuid                UUID NOT NULL UNIQUE
+
+    estate_id            BIGINT NOT NULL
+    employee_area_id     BIGINT NOT NULL
+    location_id          BIGINT NULL
+
+    assigned_at          TIMESTAMP NOT NULL
+    unassigned_at        TIMESTAMP NULL
+
+    status              BOOLEAN NOT NULL DEFAULT TRUE
+
+    created_at           TIMESTAMP NULL
+    updated_at           TIMESTAMP NULL
+
+    RELACIONES:
+    estate_id REFERENCES estates(id)
+    employee_area_id REFERENCES employee_area(id)
+    location_id REFERENCES locations(id)
+
+    ÍNDICES:
+    unique(uuid)
+    index(estate_id)
+    index(employee_area_id)
+    index(location_id)
+    index(status)
+    index(assigned_at)
+    index(unassigned_at)
+    index(estate_id, status)
+    index(employee_area_id, status)
+    index(location_id, status)
+
+    REGLA IMPORTANTE EN POSTGRESQL:
+    Un bien solo puede tener una asignación activa a la vez.
+
+    ÍNDICE PARCIAL RECOMENDADO:
+    CREATE UNIQUE INDEX estate_assignments_one_active_per_estate
+    ON estate_assignments (estate_id)
+    WHERE status = TRUE;
+
+========================================================
+TABLA: audit_logs
+DESCRIPCIÓN: Registro técnico de acciones realizadas en el sistema.
+Sirve para saber quién creó, actualizó, asignó, movió o eliminó algo.
+========================================================
+
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT
+    user_id             BIGINT NULL
+
+    auditable_type      VARCHAR(150) NOT NULL
+    auditable_id        BIGINT NOT NULL
+
+    action              VARCHAR(80) NOT NULL
+
+    old_values          JSONB NULL
+    new_values          JSONB NULL
+
+    ip_address          VARCHAR(80) NULL
+    user_agent          TEXT NULL
+
+    created_at          TIMESTAMP NULL
+
+    RELACIONES:
+    user_id REFERENCES users(id)
+
+    ÍNDICES:
+    index(user_id)
+    index(auditable_type, auditable_id)
+    index(action)
+    index(created_at)
+
+
+========================================================
+EJEMPLOS DE USO DEL SISTEMA
+========================================================
+
+EJEMPLO 1: Registro inicial de un bien
+Supongamos que existe el área TECNOLOGÍAS en la tabla areas con id = 1, y también existe la ubicación física OFICINA DE INFORMÁTICA en la tabla locations con id = 4. Luego se registra al empleado JUAN REYES en employees con id = 1, y se vincula a TECNOLOGÍAS mediante employee_area con id = 1. Después se registra una laptop en estates con internal_code = BIEN-000001, denomination = LAPTOP, brand = LENOVO, model = THINKPAD E14, situation = USO y conservation_status = BUENO. Finalmente, para indicar que esa laptop está asignada actualmente a Juan Reyes, se crea un registro en estate_assignments con estate_id = 1, employee_area_id = 1, location_id = 4, assigned_at con la fecha actual, unassigned_at = NULL y status = TRUE. De esta forma, el sistema sabe qué bien es, quién lo tiene, a qué área pertenece el responsable y dónde está ubicado físicamente.
+
+EJEMPLO 2: Movimiento de un bien a otra ubicación
+Supongamos que la laptop BIEN-000001 estaba en la OFICINA DE INFORMÁTICA, pero luego se mueve al ALMACÉN CENTRAL. En ese caso, no se recomienda editar directamente la asignación anterior como si nada hubiera pasado, porque se perdería el historial real del movimiento. Lo correcto sería cerrar la asignación anterior en estate_assignments colocando status = FALSE y llenando unassigned_at con la fecha del traslado. Luego se crea una nueva fila en estate_assignments con el mismo estate_id, el mismo employee_area_id si el responsable sigue siendo Juan Reyes, pero con el nuevo location_id correspondiente a ALMACÉN CENTRAL. Esta nueva fila tendrá assigned_at con la fecha del traslado, unassigned_at = NULL y status = TRUE. Así el sistema puede mostrar la ubicación actual del bien, pero también puede consultar dónde estuvo antes y cuándo se realizó el movimiento.
+
+EJEMPLO 3: Cambio de responsable del bien
+Supongamos que la laptop BIEN-000001 ya no estará bajo responsabilidad de JUAN REYES y ahora pasará a MARÍA TORRES, quien también pertenece al área TECNOLOGÍAS. Primero se debe tener registrada a María en employees y vinculada al área mediante employee_area. Luego, en estate_assignments, se cierra la asignación activa de Juan Reyes colocando status = FALSE y unassigned_at con la fecha del cambio. Después se crea una nueva asignación activa con el mismo estate_id, pero con el employee_area_id de María Torres. Si el bien sigue físicamente en la misma oficina, se conserva el mismo location_id; si además cambió de ubicación, también se coloca el nuevo location_id. Este flujo permite saber quién tuvo antes el bien, quién lo tiene ahora y desde qué fecha asumió la responsabilidad.
+
+EJEMPLO 4: Usuario del sistema vinculado a un área
+Supongamos que ANGEL MENDOZA es un usuario del sistema registrado en users con username = amendoza y status = TRUE. Para que Angel pueda gestionar bienes del área TECNOLOGÍAS, se crea un registro en user_area con user_id = 1, area_id = 1 y status = TRUE. Esto no significa que Angel sea el responsable físico de los bienes, sino que tiene acceso administrativo sobre esa área dentro del sistema. Los permisos específicos, como crear bienes, editar bienes, mover bienes o ver reportes, se manejarían con Spatie Permission mediante roles y permisos. Así se separa correctamente el acceso al sistema de la responsabilidad patrimonial.
+
+EJEMPLO 5: Diferencia entre área y ubicación
+El área representa la unidad administrativa responsable, por ejemplo TECNOLOGÍAS, LOGÍSTICA, CONTABILIDAD o ALMACÉN CENTRAL. La ubicación representa el lugar físico donde se encuentra el bien, por ejemplo PALACIO MUNICIPAL, COSTADO DE PALACIO MUNICIPAL, OFICINA DE INFORMÁTICA, DEPÓSITO o ALMACÉN PRINCIPAL. Por eso no conviene mezclar areas con locations. Un bien puede pertenecer administrativamente al área TECNOLOGÍAS, pero estar físicamente en la OFICINA DE INFORMÁTICA. También podría pertenecer al área LOGÍSTICA, pero estar ubicado en el ALMACÉN CENTRAL. Esta separación evita confusiones y permite reportes más precisos.
+
+EJEMPLO 6: Jerarquía de ubicaciones físicas
+La tabla locations permite crear ubicaciones principales y sububicaciones mediante parent_id. Por ejemplo, PALACIO MUNICIPAL puede tener parent_id = NULL porque es una ubicación principal. Dentro de PALACIO MUNICIPAL puede existir OFICINA DE INFORMÁTICA con parent_id apuntando al id de PALACIO MUNICIPAL. También podría existir COSTADO DE PALACIO MUNICIPAL como otra ubicación física, y dentro de ella el ALMACÉN CENTRAL. Esto permite representar ubicaciones de forma ordenada, como si fuera un árbol: sede, local, piso, oficina, almacén o depósito.
+
+EJEMPLO 7: Corrección de datos versus movimiento real
+Si un bien fue registrado por error en la ubicación ALMACÉN CENTRAL, pero realmente nunca estuvo ahí y siempre estuvo en OFICINA DE INFORMÁTICA, entonces eso no es un movimiento real, sino una corrección. En ese caso sí se puede actualizar la misma fila de estate_assignments y registrar el cambio en audit_logs con action = CORRECTED. En cambio, si el bien sí estuvo realmente en OFICINA DE INFORMÁTICA y luego fue trasladado físicamente al ALMACÉN CENTRAL, eso sí es un movimiento real. En ese caso se debe cerrar la asignación anterior y crear una nueva asignación activa. La regla práctica es simple: si fue error de digitación, se corrige; si fue un traslado real, se crea historial.
+
+EJEMPLO 8: Uso de audit_logs
+La tabla audit_logs no reemplaza el historial de estate_assignments. Su función es registrar quién hizo una acción, cuándo la hizo, desde qué IP y qué valores cambiaron. Por ejemplo, cuando Angel Mendoza registra la laptop BIEN-000001, se puede guardar un audit_log con action = CREATED, auditable_type = estates, auditable_id = 1 y new_values con los datos iniciales del bien. Si luego Angel mueve la laptop al ALMACÉN CENTRAL, se puede guardar otro audit_log con action = MOVED, auditable_type = estate_assignments, auditable_id correspondiente y old_values/new_values indicando la ubicación anterior y la nueva. Así estate_assignments conserva el historial patrimonial oficial, mientras audit_logs conserva la trazabilidad técnica de las acciones realizadas en el sistema.
+
+EJEMPLO 9: Consulta de ubicación actual de un bien
+Para saber dónde está actualmente un bien, el sistema debe buscar en estate_assignments la fila donde estate_id corresponde al bien consultado y status = TRUE. Esa fila activa indica el responsable actual mediante employee_area_id y la ubicación física actual mediante location_id. Como se recomienda tener una regla en PostgreSQL para que un bien solo pueda tener una asignación activa a la vez, el sistema evita inconsistencias como que una misma laptop aparezca asignada simultáneamente a dos personas o dos ubicaciones distintas.
+
+EJEMPLO 10: Consulta de historial de un bien
+Para ver todo el historial de un bien, el sistema debe consultar todas las filas de estate_assignments relacionadas al mismo estate_id, ordenadas por assigned_at. Las filas con status = FALSE y unassigned_at lleno representan asignaciones pasadas, mientras que la fila con status = TRUE y unassigned_at = NULL representa la asignación actual. De esta manera se puede saber por qué áreas, responsables y ubicaciones pasó un bien desde que fue registrado en el sistema.

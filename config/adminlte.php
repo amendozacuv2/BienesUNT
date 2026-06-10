@@ -154,9 +154,9 @@ return [
 
     'layout_topnav' => null,
     'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => null,
-    'layout_fixed_footer' => true,
+    'layout_fixed_sidebar' => true,
+    'layout_fixed_navbar' => true,
+    'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
 
     /*
@@ -336,6 +336,12 @@ return [
             'icon' => 'fas fa-fw fa-user-cog',
             'can' => 'view.user',
         ],
+        [
+            'text' => 'Bienes',
+            'route' => 'estates.index',
+            'icon' => 'fas fa-fw fa-user-cog',
+            'can' => 'view.estate',
+        ],
 
     ],
 
@@ -375,7 +381,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -395,7 +401,7 @@ return [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -406,6 +412,16 @@ return [
                     'type' => 'css',
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css',
+                ],
+            ],
+        ],
+        'Select2Bootstrap4Theme' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css',
                 ],
             ],
         ],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EstateFieldSuggestionController;
 use App\Livewire\Areas\Create as AreasCreate;
 use App\Livewire\Areas\Edit as AreasEdit;
 use App\Livewire\Areas\Index as AreasIndex;
@@ -16,6 +17,9 @@ use App\Livewire\Employees\Index as EmployeesIndex;
 use App\Livewire\Users\Create as UsersCreate;
 use App\Livewire\Users\Edit as UsersEdit;
 use App\Livewire\Users\Index as UsersIndex;
+use App\Livewire\Estates\Create as EstatesCreate;
+use App\Livewire\Estates\Edit as EstatesEdit;
+use App\Livewire\Estates\Index as EstatesIndex;
 
 use Illuminate\Support\Facades\Route;
 
@@ -79,7 +83,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('edit');
         });
 
-    Route::prefix('employees')
+
+        Route::prefix('employees')
     ->name('employees.')
     ->group(function () {
         Route::get('/', EmployeesIndex::class)
@@ -111,6 +116,25 @@ Route::middleware(['auth'])->group(function () {
             ->name('edit');
     });
     
+    Route::prefix('estates')
+    ->name('estates.')
+    ->group(function () {
+        Route::get('/field-options', EstateFieldSuggestionController::class)
+            ->name('field-options');
+
+        Route::get('/', EstatesIndex::class)
+            ->middleware('permission:view.estate')
+            ->name('index');
+
+        Route::get('/crear', EstatesCreate::class)
+            ->middleware('permission:create.estate')
+            ->name('create');
+
+        Route::get('/{estate:uuid}/editar', EstatesEdit::class)
+            ->middleware('permission:edit.estate')
+            ->name('edit');
+    });
+
 });
 
 require __DIR__.'/auth.php';

@@ -2,12 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Estate extends Model
 {
     use HasUuids;
+
+    public const SITUATIONS = [
+        'EN USO',
+        'DESUSO',
+    ];
+
+    public const CONSERVATION_STATUSES = [
+        'BUENO',
+        'REGULAR',
+        'MALO',
+    ];
+
+    public const LIVE_SEARCH_EXPRESSION = <<<'SQL'
+        LOWER(
+            COALESCE(patrimonial_code, '') || ' ' ||
+            COALESCE(internal_code, '') || ' ' ||
+            COALESCE(denomination, '') || ' ' ||
+            COALESCE(brand, '') || ' ' ||
+            COALESCE(model, '') || ' ' ||
+            COALESCE(type, '') || ' ' ||
+            COALESCE(observation, '')
+        )
+        SQL;
 
     protected $fillable = [
         'uuid',
@@ -26,6 +50,11 @@ class Estate extends Model
         'conservation_status',
         'observation',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     public function location()
     {
@@ -49,7 +78,7 @@ class Estate extends Model
         return $this->morphMany(AuditLog::class, 'auditable')->latest('created_at');
     }
 
-    public function scopeLiveSearch($query, ?string $search)
+    public function scopeLiveSearch(Builder $query, ?string $search): Builder
     {
         $search = trim((string) $search);
 
@@ -57,22 +86,10 @@ class Estate extends Model
             return $query;
         }
 
-        $search = mb_strtolower($search);
-
-        return $query->whereRaw("
-            LOWER(
-                COALESCE(patrimonial_code, '') || ' ' ||
-                COALESCE(internal_code, '') || ' ' ||
-                COALESCE(denomination, '') || ' ' ||
-                COALESCE(brand, '') || ' ' ||
-                COALESCE(model, '') || ' ' ||
-                COALESCE(type, '') || ' ' ||
-                COALESCE(color, '') || ' ' ||
-                COALESCE(series, '') || ' ' ||
-                COALESCE(situation, '') || ' ' ||
-                COALESCE(conservation_status, '')
-            ) ILIKE ?
-        ", ['%' . $search . '%']);
+        return $query->whereRaw(
+            self::LIVE_SEARCH_EXPRESSION.' LIKE ?',
+            ['%'.mb_strtolower($search).'%']
+        );
     }
 
     public function scopeByLocation($query, ?int $locationId)

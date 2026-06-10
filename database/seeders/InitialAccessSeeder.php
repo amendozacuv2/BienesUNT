@@ -177,6 +177,12 @@ class InitialAccessSeeder extends Seeder
                 'order' => 63,
                 'description' => 'Eliminar Bien',
             ],
+            [
+                'name' => 'export.estate',
+                'guard_name' => 'web',
+                'order' => 64,
+                'description' => 'Export Bien - Excel',
+            ],
 
         ];
 
