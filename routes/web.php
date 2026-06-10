@@ -1,26 +1,26 @@
 <?php
 
 use App\Http\Controllers\EstateFieldSuggestionController;
+use App\Http\Controllers\Estates\DownloadEstatesExportController;
 use App\Livewire\Areas\Create as AreasCreate;
 use App\Livewire\Areas\Edit as AreasEdit;
 use App\Livewire\Areas\Index as AreasIndex;
+use App\Livewire\Employees\Create as EmployeesCreate;
+use App\Livewire\Employees\Edit as EmployeesEdit;
+use App\Livewire\Employees\Index as EmployeesIndex;
+use App\Livewire\Estates\Create as EstatesCreate;
+use App\Livewire\Estates\Edit as EstatesEdit;
+use App\Livewire\Estates\Index as EstatesIndex;
+use App\Livewire\Locations\Create as LocationsCreate;
+use App\Livewire\Locations\Edit as LocationsEdit;
+use App\Livewire\Locations\Index as LocationsIndex;
 use App\Livewire\Profile\Index as ProfileIndex;
 use App\Livewire\Roles\Create as RolesCreate;
 use App\Livewire\Roles\Edit as RolesEdit;
 use App\Livewire\Roles\Index as RolesIndex;
-use App\Livewire\Locations\Create as LocationsCreate;
-use App\Livewire\Locations\Edit as LocationsEdit;
-use App\Livewire\Locations\Index as LocationsIndex;
-use App\Livewire\Employees\Create as EmployeesCreate;
-use App\Livewire\Employees\Edit as EmployeesEdit;
-use App\Livewire\Employees\Index as EmployeesIndex;
 use App\Livewire\Users\Create as UsersCreate;
 use App\Livewire\Users\Edit as UsersEdit;
 use App\Livewire\Users\Index as UsersIndex;
-use App\Livewire\Estates\Create as EstatesCreate;
-use App\Livewire\Estates\Edit as EstatesEdit;
-use App\Livewire\Estates\Index as EstatesIndex;
-
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
@@ -83,57 +83,60 @@ Route::middleware(['auth'])->group(function () {
                 ->name('edit');
         });
 
+    Route::prefix('employees')
+        ->name('employees.')
+        ->group(function () {
+            Route::get('/', EmployeesIndex::class)
+                ->middleware('permission:view.employee')
+                ->name('index');
 
-        Route::prefix('employees')
-    ->name('employees.')
-    ->group(function () {
-        Route::get('/', EmployeesIndex::class)
-            ->middleware('permission:view.employee')
-            ->name('index');
+            Route::get('/crear', EmployeesCreate::class)
+                ->middleware('permission:create.employee')
+                ->name('create');
 
-        Route::get('/crear', EmployeesCreate::class)
-            ->middleware('permission:create.employee')
-            ->name('create');
-
-        Route::get('/{employee:uuid}/editar', EmployeesEdit::class)
-            ->middleware('permission:edit.employee')
-            ->name('edit');
-    });
+            Route::get('/{employee:uuid}/editar', EmployeesEdit::class)
+                ->middleware('permission:edit.employee')
+                ->name('edit');
+        });
 
     Route::prefix('users')
-    ->name('users.')
-    ->group(function () {
-        Route::get('/', UsersIndex::class)
-            ->middleware('permission:view.user')
-            ->name('index');
+        ->name('users.')
+        ->group(function () {
+            Route::get('/', UsersIndex::class)
+                ->middleware('permission:view.user')
+                ->name('index');
 
-        Route::get('/crear', UsersCreate::class)
-            ->middleware('permission:create.user')
-            ->name('create');
+            Route::get('/crear', UsersCreate::class)
+                ->middleware('permission:create.user')
+                ->name('create');
 
-        Route::get('/{user:uuid}/editar', UsersEdit::class)
-            ->middleware('permission:edit.user')
-            ->name('edit');
-    });
-    
+            Route::get('/{user:uuid}/editar', UsersEdit::class)
+                ->middleware('permission:edit.user')
+                ->name('edit');
+        });
+
     Route::prefix('estates')
-    ->name('estates.')
-    ->group(function () {
-        Route::get('/field-options', EstateFieldSuggestionController::class)
-            ->name('field-options');
+        ->name('estates.')
+        ->group(function () {
+            Route::get('/field-options', EstateFieldSuggestionController::class)
+                ->name('field-options');
 
-        Route::get('/', EstatesIndex::class)
-            ->middleware('permission:view.estate')
-            ->name('index');
+            Route::get('/', EstatesIndex::class)
+                ->middleware('permission:view.estate')
+                ->name('index');
 
-        Route::get('/crear', EstatesCreate::class)
-            ->middleware('permission:create.estate')
-            ->name('create');
+            Route::get('/exportar/descargar', DownloadEstatesExportController::class)
+                ->middleware('permission:export.estate')
+                ->name('export.download');
 
-        Route::get('/{estate:uuid}/editar', EstatesEdit::class)
-            ->middleware('permission:edit.estate')
-            ->name('edit');
-    });
+            Route::get('/crear', EstatesCreate::class)
+                ->middleware('permission:create.estate')
+                ->name('create');
+
+            Route::get('/{estate:uuid}/editar', EstatesEdit::class)
+                ->middleware('permission:edit.estate')
+                ->name('edit');
+        });
 
 });
 

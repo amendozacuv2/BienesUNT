@@ -8,17 +8,40 @@
                         Listado de bienes
                     </h3>
 
-                    @can('create.estate')
-                        <div class="card-tools">
+                    <div class="card-tools">
+                        @can('export.estate')
+                            <button
+                                type="button"
+                                class="btn btn-success btn-sm"
+                                wire:click="requestExport"
+                                wire:loading.attr="disabled"
+                                wire:target="requestExport"
+                            >
+                                <span wire:loading.remove wire:target="requestExport">
+                                    <i class="fas fa-file-excel mr-1"></i>
+                                    Exportar
+                                </span>
+                                <span wire:loading wire:target="requestExport">
+                                    <i class="fas fa-spinner fa-spin mr-1"></i>
+                                    Enviando...
+                                </span>
+                            </button>
+                        @endcan
+
+                        @can('create.estate')
                             <a href="{{ route('estates.create') }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus-circle mr-1"></i>
                                 Nuevo registro
                             </a>
-                        </div>
-                    @endcan
+                        @endcan
+                    </div>
                 </div>
 
                 <div class="card-body">
+                    @can('export.estate')
+                        <livewire:estates.export-status />
+                    @endcan
+
                     @include('livewire.estates.partials.widgets', [
                         'widgets' => $widgets ?? [],
                     ])

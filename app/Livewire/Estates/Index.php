@@ -7,7 +7,8 @@ use App\Models\Area;
 use App\Models\Estate;
 use App\Models\Location;
 use App\Services\Estates\EstateAuditLogger;
-use App\Services\Estates\EstateFieldSuggestions;
+use App\Services\Estates\EstateLocationAccessService;
+use App\Services\Estates\Exports\RequestEstateExport;
 use App\Services\Estates\SearchEstates;
 use App\Services\Estates\WidgetsService;
 use Illuminate\Contracts\View\View;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use RuntimeException;
 use Throwable;
 
 class Index extends Component
@@ -90,11 +92,35 @@ class Index extends Component
                 $estate->delete();
             });
 
-            app(EstateFieldSuggestions::class)->invalidateCache();
-
             $this->notifySuccess('El bien fue eliminado correctamente.');
         } catch (Throwable) {
             $this->notifyError('No se pudo eliminar el bien seleccionado.');
+        }
+    }
+
+    public function requestExport(
+        RequestEstateExport $requestExport,
+        EstateLocationAccessService $accessService
+    ): void {
+        abort_unless(Auth::user()?->can('export.estate'), 403);
+
+        try {
+            $filters = array_merge($this->normalizedFilters(), [
+                'search' => filled($this->search) ? trim($this->search) : null,
+            ]);
+
+            $requestExport->request(
+                Auth::user(),
+                $accessService->assignedAreaIds(Auth::user()),
+                $filters
+            );
+
+            $this->dispatch('estate-export-requested');
+            $this->notifySuccess('La exportación fue enviada a cola. Puedes seguir usando el sistema.');
+        } catch (RuntimeException $exception) {
+            $this->notifyWarning($exception->getMessage());
+        } catch (Throwable) {
+            $this->notifyError('No se pudo enviar la exportación a cola.');
         }
     }
 
@@ -103,11 +129,7 @@ class Index extends Component
         abort_unless(Auth::user()?->can('view.estate'), 403);
 
         $allowedAreaIds = $this->assignedAreaIds();
-
-        $areaId = $this->areaId !== '' ? (int) $this->areaId : null;
-        $locationId = $this->locationId !== '' ? (int) $this->locationId : null;
-        $situation = $this->situation !== '' ? $this->situation : null;
-        $conservationStatus = $this->conservationStatus !== '' ? $this->conservationStatus : null;
+        $filters = $this->normalizedFilters();
 
         $areas = Area::query()
             ->whereIn('id', $allowedAreaIds)
@@ -129,10 +151,10 @@ class Index extends Component
         $estatesQuery = app(SearchEstates::class)->forIndex(
             $allowedAreaIds,
             $this->search,
-            $areaId,
-            $locationId,
-            $situation,
-            $conservationStatus
+            $filters['areaId'],
+            $filters['locationId'],
+            $filters['situation'],
+            $filters['conservationStatus']
         );
 
         $estates = $estatesQuery
@@ -142,10 +164,10 @@ class Index extends Component
         $widgets = app(WidgetsService::class)->forIndex(
             $allowedAreaIds,
             $this->search,
-            $areaId,
-            $locationId,
-            $situation,
-            $conservationStatus
+            $filters['areaId'],
+            $filters['locationId'],
+            $filters['situation'],
+            $filters['conservationStatus']
         );
 
         return view('livewire.estates.index', [
@@ -159,6 +181,16 @@ class Index extends Component
             'title' => 'Bienes',
             'headerTitle' => 'Bienes',
         ]);
+    }
+
+    private function normalizedFilters(): array
+    {
+        return [
+            'areaId' => $this->areaId !== '' ? (int) $this->areaId : null,
+            'locationId' => $this->locationId !== '' ? (int) $this->locationId : null,
+            'situation' => $this->situation !== '' ? $this->situation : null,
+            'conservationStatus' => $this->conservationStatus !== '' ? $this->conservationStatus : null,
+        ];
     }
 
     private function assignedAreaIds(): array
