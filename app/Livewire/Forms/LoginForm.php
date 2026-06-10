@@ -28,6 +28,8 @@ class LoginForm extends Form
      */
     public function authenticate(): void
     {
+        $this->username = trim($this->username);
+
         $this->ensureIsNotRateLimited();
 
         $credentials = [
@@ -76,7 +78,7 @@ class LoginForm extends Form
     protected function throttleKey(): string
     {
         return Str::transliterate(
-            Str::lower($this->username) . '|' . request()->ip()
+            Str::lower(trim($this->username)) . '|' . request()->ip()
         );
     }
 }

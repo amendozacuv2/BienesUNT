@@ -63,9 +63,9 @@ return [
     |
     */
 
-    'logo' => '<b>Bienes</b>Sistema',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo' => '<b>UNT</b> Bienes',
+    'logo_img' => 'img/LANZALOCODE-BLANCO.png',
+    'logo_img_class' => 'brand-image elevation-0',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'Admin Logo',
@@ -86,8 +86,8 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'Auth Logo',
+            'path' => 'img/logologin.png',
+            'alt' => 'Login Logo',
             'class' => '',
             'width' => 50,
             'height' => 50,
@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'profile',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => false,
@@ -299,50 +299,114 @@ return [
     */
 
     'menu' => [
-        // Navbar items:
         [
             'text' => 'Mi Perfil',
             'route' => 'profile',
-            'icon' => 'fas fa-fw fa-user-cog',
+            'icon' => 'fas fa-fw fa-user-circle',
             'can' => 'view.profile',
         ],
+
         [
-            'text' => 'Roles',
-            'route' => 'roles.index',
-            'icon' => 'fas fa-fw fa-user-cog',
+            'header' => 'ROLES',
             'can' => 'view.role',
         ],
         [
-            'text' => 'Áreas',
-            'route' => 'areas.index',
-            'icon' => 'fas fa-fw fa-user-cog',
-            'can' => 'view.area',
+            'text' => 'Listado de Roles',
+            'route' => 'roles.index',
+            'icon' => 'fas fa-fw fa-user-shield',
+            'can' => 'view.role',
         ],
         [
-            'text' => 'Ubicaciones',
-            'route' => 'locations.index',
-            'icon' => 'fas fa-fw fa-user-cog',
-            'can' => 'view.location',
+            'text' => 'Crear Rol',
+            'route' => 'roles.create',
+            'icon' => 'fas fa-fw fa-plus-circle',
+            'can' => 'create.role',
         ],
+
         [
-            'text' => 'Empleados',
-            'route' => 'employees.index',
-            'icon' => 'fas fa-fw fa-user-cog',
-            'can' => 'view.employee',
-        ],
-        [
-            'text' => 'Usuarios',
-            'route' => 'users.index',
-            'icon' => 'fas fa-fw fa-user-cog',
+            'header' => 'USUARIOS',
             'can' => 'view.user',
         ],
         [
-            'text' => 'Bienes',
-            'route' => 'estates.index',
-            'icon' => 'fas fa-fw fa-user-cog',
-            'can' => 'view.estate',
+            'text' => 'Listado de Usuarios',
+            'route' => 'users.index',
+            'icon' => 'fas fa-fw fa-users-cog',
+            'can' => 'view.user',
+        ],
+        [
+            'text' => 'Crear Usuario',
+            'route' => 'users.create',
+            'icon' => 'fas fa-fw fa-user-plus',
+            'can' => 'create.user',
         ],
 
+        [
+            'header' => 'ÁREAS',
+            'can' => 'view.area',
+        ],
+        [
+            'text' => 'Listado de Áreas',
+            'route' => 'areas.index',
+            'icon' => 'fas fa-fw fa-sitemap',
+            'can' => 'view.area',
+        ],
+        [
+            'text' => 'Crear Área',
+            'route' => 'areas.create',
+            'icon' => 'fas fa-fw fa-plus-circle',
+            'can' => 'create.area',
+        ],
+
+        [
+            'header' => 'UBICACIONES',
+            'can' => 'view.location',
+        ],
+        [
+            'text' => 'Listado de Ubicaciones',
+            'route' => 'locations.index',
+            'icon' => 'fas fa-fw fa-map-marker-alt',
+            'can' => 'view.location',
+        ],
+        [
+            'text' => 'Crear Ubicación',
+            'route' => 'locations.create',
+            'icon' => 'fas fa-fw fa-plus-circle',
+            'can' => 'create.location',
+        ],
+
+        [
+            'header' => 'EMPLEADOS',
+            'can' => 'view.employee',
+        ],
+        [
+            'text' => 'Listado de Empleados',
+            'route' => 'employees.index',
+            'icon' => 'fas fa-fw fa-id-card',
+            'can' => 'view.employee',
+        ],
+        [
+            'text' => 'Crear Empleado',
+            'route' => 'employees.create',
+            'icon' => 'fas fa-fw fa-user-plus',
+            'can' => 'create.employee',
+        ],
+
+        [
+            'header' => 'BIENES',
+            'can' => 'view.estate',
+        ],
+        [
+            'text' => 'Listado de Bienes',
+            'route' => 'estates.index',
+            'icon' => 'fas fa-fw fa-boxes',
+            'can' => 'view.estate',
+        ],
+        [
+            'text' => 'Crear Bien',
+            'route' => 'estates.create',
+            'icon' => 'fas fa-fw fa-plus-circle',
+            'can' => 'create.estate',
+        ],
     ],
 
     /*
