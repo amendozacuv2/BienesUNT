@@ -5,10 +5,11 @@ namespace Tests\Unit\Estates;
 use App\Models\Area;
 use App\Models\Estate;
 use App\Models\Location;
+use App\Services\Estates\Exports\EstateExportAreaEmployees;
 use App\Services\Estates\Exports\EstateExportQuery;
 use App\Services\Estates\Exports\EstateExportRowMapper;
 use App\Services\Estates\Exports\StreamEstatesToExcel;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 use Mockery;
 use OpenSpout\Reader\XLSX\Reader;
 use Tests\TestCase;
@@ -42,7 +43,11 @@ class StreamEstatesToExcelTest extends TestCase
 
         $path = storage_path('framework/testing/stream-estates-export.xlsx');
 
-        (new StreamEstatesToExcel($exportQuery, new EstateExportRowMapper))
+        $areaEmployees = Mockery::mock(EstateExportAreaEmployees::class);
+        $areaEmployees->shouldReceive('warm')->once()->with([1]);
+        $areaEmployees->shouldReceive('forArea')->andReturn('SIN ENCARGADO');
+
+        (new StreamEstatesToExcel($exportQuery, new EstateExportRowMapper($areaEmployees), $areaEmployees))
             ->write([1], $this->emptyFilters(), $path);
 
         $this->assertWorkbookXml($path);

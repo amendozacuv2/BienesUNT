@@ -57,16 +57,23 @@ class StreamEstatesToExcel
         18 => 20,
     ];
 
+    private EstateExportAreaEmployees $areaEmployees;
+
     public function __construct(
         private readonly EstateExportQuery $exportQuery,
-        private readonly EstateExportRowMapper $rowMapper
-    ) {}
+        private readonly EstateExportRowMapper $rowMapper,
+        ?EstateExportAreaEmployees $areaEmployees = null
+    ) {
+        $this->areaEmployees = $areaEmployees ?? app(EstateExportAreaEmployees::class);
+    }
 
     public function write(
         array $allowedAreaIds,
         array $filters,
         string $outputPath = 'php://output'
     ): void {
+        $this->areaEmployees->warm($allowedAreaIds);
+
         $writer = new Writer(new Options);
         $writer->openToFile($outputPath);
 
